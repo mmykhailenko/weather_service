@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-
-from weather.models import Weather
+from .models import Weather, Forecast
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -19,4 +18,10 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class WeatherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Weather
+        fields = '__all__'
+
+
+class ForecastSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Forecast
         fields = '__all__'
