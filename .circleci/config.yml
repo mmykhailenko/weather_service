@@ -45,7 +45,7 @@ jobs:
       # https://pytest.org
       # https://nose.readthedocs.io
       - run:
-          name: run tests
+          name: run flake8
           command: |
             . venv/bin/activate
             flake8 weather_service
