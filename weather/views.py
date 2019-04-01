@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 import requests
 from rest_framework.views import APIView
+
+from weather.consts import NOT_FOUND_RESP_CODE
 from .models import Weather, Forecast, City
 from .serializer import UserSerializer, GroupSerializer, WeatherSerializer, ForecastSerializer, CitySerializer
 
@@ -33,7 +35,7 @@ class WeatherDetail(APIView):
 
         response = requests.get(url).json()
 
-        if response.get('cod') != 200:
+        if NOT_FOUND_RESP_CODE in response.get('cod'):
             return Response(response, status=400)
 
         data = {
@@ -80,8 +82,8 @@ class ForecastDetail(APIView):
             format(city, cnt, API_KEY)
         response = requests.get(forecast_url).json()
 
-        if response.get('cod') != 200:
-            return Response(response, status=400)
+        if NOT_FOUND_RESP_CODE in response.get('cod'):
+            return Response(response, status=404)
 
         weather_data = []
         res1 = {"city": {
