@@ -16,6 +16,9 @@ Including another URLconf
 from django.urls import include, path
 from rest_framework import routers
 from weather import views
+from rest_framework_swagger.views import get_swagger_view
+
+schema_view = get_swagger_view(title='Weather API')
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
@@ -25,7 +28,9 @@ router.register(r'groups', views.GroupViewSet)
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('weather/<str:city>', views.weather_save),
-    path('weathers/', views.weather_get)
+    path('', include('weather.urls')),
+    path('swagger-docs/', schema_view),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
+
+
