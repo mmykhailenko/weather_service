@@ -8,9 +8,12 @@ from rest_framework.views import APIView
 from .models import Weather, Forecast, City
 from .serializer import UserSerializer, GroupSerializer, WeatherSerializer, ForecastSerializer, CitySerializer
 
+CURR_LOCATION_URL = "https://api.ipdata.co?api-key=test"
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """
+    get:
     API endpoint that allows users to be viewed or edited.
     """
     queryset = User.objects.all().order_by('-date_joined')
@@ -19,6 +22,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class GroupViewSet(viewsets.ModelViewSet):
     """
+    get:
     API endpoint that allows groups to be viewed or edited.
     """
     queryset = Group.objects.all()
@@ -26,6 +30,10 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 
 class WeatherDetail(APIView):
+    """
+    get:
+    Return current weather in teh specified city
+    """
 
     def get(self, request, city):
         url = "http://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid={}".format(city, config.API_KEY)
@@ -96,9 +104,49 @@ class ForecastDetail(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class WeatherCurrentLocation(APIView):
+    """
+    get:
+    Get weather in city, found by current ip address
+    """
+
+    @staticmethod
+    def get_current_location():
+        r = requests.get(CURR_LOCATION_URL).json()
+        lat = r['latitude']
+        lon = r['longitude']
+        return {'lat': lat, 'lon': lon}
+
+    def get_weather_by_location(self):
+        URL_WEATHER = 'http://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&units=metric&appid={}'
+
+        location = self.get_current_location()
+        return requests.get(URL_WEATHER.format(location['lat'], location['lon'], config.API_KEY))
 
 
+    def get(self, request):
+        response = self.get_weather_by_location().json()
+        if response["cod"] != 200:
+            return Response(response["message"], status=status.HTTP_400_BAD_REQUEST)
 
+        data = {
+            "city": {
+                "city_name": response.get("name"),
+                "cord_lon": response["coord"]["lon"],
+                "cord_lat": response["coord"]["lat"]
+            },
+            "weather_main": response["weather"][0]["main"],
+            "weather_description": response["weather"][0]["description"],
+            "temp": response["main"]["temp"],
+            "date_time": response.get("dt")
+        }
+
+        serializer = WeatherSerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=400)
 
 
 

@@ -4,6 +4,7 @@ from weather import views
 
 urlpatterns = [
 
+    path('weather/current', views.WeatherCurrentLocation().as_view()),
     path('weather/<str:city>', views.WeatherDetail.as_view()),
     path('forecast/<str:city>/<int:cnt>', views.ForecastDetail.as_view()),
     path('weather/', views.WeatherList.as_view()),
