@@ -7,6 +7,7 @@ import requests
 from rest_framework.views import APIView
 from .models import Weather, Forecast, City
 from .serializer import UserSerializer, GroupSerializer, WeatherSerializer, ForecastSerializer, CitySerializer
+from weather.config import WEATHER_CITY_URL, FORECAST_CIRY_DAYS_URL, WEATHER_LON_LAT_URL
 
 CURR_LOCATION_URL = "https://api.ipdata.co?api-key=test"
 
@@ -36,7 +37,7 @@ class WeatherDetail(APIView):
     """
 
     def get(self, request, city):
-        url = "http://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid={}".format(city, config.API_KEY)
+        url = WEATHER_CITY_URL.format(city, config.API_KEY)
 
         response = requests.get(url).json()
         data = {
@@ -79,8 +80,7 @@ class ForecastDetail(APIView):
 
     def get(self, request, city, cnt):
 
-        forecast_url = "http://api.openweathermap.org/data/2.5/forecast?q={}&units=metric&cnt={}&appid={}".\
-            format(city, cnt, config.API_KEY)
+        forecast_url = FORECAST_CIRY_DAYS_URL.format(city, cnt, config.API_KEY)
         response = requests.get(forecast_url).json()
         weather_data = []
         res1 = {"city": {
@@ -118,10 +118,8 @@ class WeatherCurrentLocation(APIView):
         return {'lat': lat, 'lon': lon}
 
     def get_weather_by_location(self):
-        URL_WEATHER = 'http://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&units=metric&appid={}'
-
         location = self.get_current_location()
-        return requests.get(URL_WEATHER.format(location['lat'], location['lon'], config.API_KEY))
+        return requests.get(WEATHER_LON_LAT_URL.format(location['lat'], location['lon'], config.API_KEY))
 
 
     def get(self, request):
