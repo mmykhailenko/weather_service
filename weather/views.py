@@ -2,17 +2,14 @@ from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
+from weather_service_api import config
 import requests
 from rest_framework.views import APIView
-
-from weather.consts import NOT_FOUND_RESP_CODE
 from .models import Weather, Forecast, City
 from .serializer import UserSerializer, GroupSerializer, WeatherSerializer, ForecastSerializer, CitySerializer
 from weather.config import WEATHER_CITY_URL, FORECAST_CIRY_DAYS_URL, WEATHER_LON_LAT_URL
 
 CURR_LOCATION_URL = "https://api.ipdata.co?api-key=test"
-
-API_KEY = "6034d87efaa342b60bd74f470f24eb86"
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -43,10 +40,6 @@ class WeatherDetail(APIView):
         url = WEATHER_CITY_URL.format(city, config.API_KEY)
 
         response = requests.get(url).json()
-
-        if NOT_FOUND_RESP_CODE in response.get('cod'):
-            return Response(response, status=400)
-
         data = {
             "city": {
                 "city_name": response.get("name"),
@@ -89,10 +82,6 @@ class ForecastDetail(APIView):
 
         forecast_url = FORECAST_CIRY_DAYS_URL.format(city, cnt, config.API_KEY)
         response = requests.get(forecast_url).json()
-
-        if NOT_FOUND_RESP_CODE in response.get('cod'):
-            return Response(response, status=404)
-
         weather_data = []
         res1 = {"city": {
             'city_name': response["city"]["name"],
@@ -156,6 +145,3 @@ class WeatherCurrentLocation(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=400)
-
-
-
