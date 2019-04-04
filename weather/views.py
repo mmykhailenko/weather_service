@@ -87,12 +87,7 @@ class ForecastDetail(APIView):
 
     def get(self, request, city, cnt):
 
-<<<<<<< HEAD
         forecast_url = FORECAST_CIRY_DAYS_URL.format(city, cnt, config.API_KEY)
-=======
-        forecast_url = "http://api.openweathermap.org/data/2.5/forecast?q={}&units=metric&cnt={}&appid={}".\
-            format(city, cnt, API_KEY)
->>>>>>> 2fc60ca63282e98eab2462b5e344e51d8908c003
         response = requests.get(forecast_url).json()
 
         if NOT_FOUND_RESP_CODE in response.get('cod'):
