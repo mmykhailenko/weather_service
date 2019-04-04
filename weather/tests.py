@@ -1,7 +1,7 @@
 from django.test import TestCase
-from weather.models import City
-from weather.serializer import CitySerializer
-from weather.config import WEATHER_CITY_URL
+from weather.models.city_model import City
+from weather.serializers.city_serializer import CitySerializer
+
 
 class CitySaveTestCase(TestCase):
     def setUp(self):
@@ -25,4 +25,4 @@ class CitySaveTestCase(TestCase):
         self.assertEqual(odessa.city_name, "Odessa")
         self.assertEqual(odessa.cord_lon, "30.72")
         self.assertEqual(odessa.cord_lat, "46.48")
-        
+
