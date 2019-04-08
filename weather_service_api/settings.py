@@ -25,7 +25,7 @@ SECRET_KEY = 'jx6dbr8&4mw#qzsax2rr_a)2y2#y9doid%)1cd-@a+%$#(jisu'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -38,8 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'weather',
-    'rest_framework_swagger'
+    'weather'
 ]
 
 MIDDLEWARE = [
@@ -86,13 +85,6 @@ DATABASES = {
         'PORT': os.environ.get('DATABASE_PORT')
     }
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': 'mydatabase',
-#     }
-# }
 
 
 # Password validation
