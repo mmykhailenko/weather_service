@@ -9,6 +9,8 @@ logger = telebot.logger
 telebot.logger.setLevel(logging.DEBUG)  # Outputs debug messages to console.
 API_TOKEN = "6034d87efaa342b60bd74f470f24eb86"
 
+SERVER_URL = "https://test-weather-the-best.herokuapp.com"
+
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -37,9 +39,37 @@ def location(message):
    #f'{url.get("name")}, {url.get("main").get("temp")}
 
 
+@bot.message_handler(content_types=["city"])
+def location(message):
+   print(message)
+   # city = message
+   # "/weather/{}".format(city)
+   # "".format(SERVER_URL,)
+
+
+   # url = requests.get().json()
+   # bot.send_message(message.chat.id, text=f'{url.get("name")}, {url.get("main").get("temp")}')
+
+   #f'{url.get("name")}, {url.get("main").get("temp")}
+
+
 @bot.message_handler(func=lambda message: True)
 def echo_message(message):
-   bot.reply_to(message, message.text)
+   city = message.text
+
+
+   url = "{}{}".format(SERVER_URL, "/weather/{}".format(city))
+
+   try:
+      resp = requests.get(url).json()
+   except Exception as exc:
+      print(exc)
+      raise
+
+   bot.send_message(message.chat.id, text=f'{resp.get("temp")}')
+
+
+   # bot.reply_to(message, message.text)
 
 
 bot.infinity_polling(True)

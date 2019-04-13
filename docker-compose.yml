@@ -4,5 +4,5 @@ services:
   web:
     build: ./
     env_file:
-      - ./.env
+      - ./.env_prod
     command: bash -c "python3 manage.py makemigrations && python manage.py migrate"

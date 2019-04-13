@@ -1,26 +1,26 @@
-version: "2.1"
-
-services:
-  db:
-    image: postgres:10
-    restart: always
-    ports:
-      - 5432:5432
-    environment:
-      POSTGRES_DB: DATABASE_NAME
-      POSTGRES_USER: DATABASE_USER
-      POSTGRES_PASSWORD: DATABASE_PASSWORD
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  adminer:
-      image: adminer
-      restart: always
-      ports:
-        - 8080:8080
+#version: "2.1"
+#
+#services:
+#  db:
+#    image: postgres:10
+#    restart: always
+#    ports:
+#      - 5432:5432
+#    environment:
+#      POSTGRES_DB: DATABASE_NAME
+#      POSTGRES_USER: DATABASE_USER
+#      POSTGRES_PASSWORD: DATABASE_PASSWORD
+#    healthcheck:
+#      test: ["CMD-SHELL", "pg_isready -U postgres"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+#
+#  adminer:
+#      image: adminer
+#      restart: always
+#      ports:
+#        - 8080:8080
   web:
     build: ./
     env_file:
@@ -28,8 +28,8 @@ services:
     command: bash -c "python3 manage.py makemigrations && python manage.py migrate && python manage.py runserver 0:8000"
     ports:
       - 8000:8000
-    depends_on:
-      db:
-        condition: service_healthy
-    links:
-      - db
+#    depends_on:
+#      db:
+#        condition: service_healthy
+#    links:
+#      - db
