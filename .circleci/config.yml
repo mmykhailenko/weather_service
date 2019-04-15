@@ -1,59 +1,39 @@
-# Python CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-python/ for more details
-#
 version: 2
 jobs:
   build:
-    docker:
-      # specify the version you desire here
-      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: circleci/python:3.6.1
+    machine: true
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~/repo
+    working_directory: ~/weather_service
 
     steps:
       - checkout
 
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "requirements.txt" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+      - run:
+          name: Build Docker image
+          command: |
+            docker build -t maxis110/bot:$CIRCLE_SHA1 -f ./docker/bot/Dockerfile .
+            docker build -t maxis110/web:$CIRCLE_SHA1 -f ./docker/web/Dockerfile .
 
       - run:
-          name: install dependencies
+          name: Push to DockerHub
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install -r requirements.txt
-
-      - save_cache:
-          paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
+            docker login -u $DOCKERHUB_LOGIN -p $DOCKERHUB_PASSWORD
+            docker push maxis110/bot:$CIRCLE_SHA1
+            docker push maxis110/web:$CIRCLE_SHA1
 
       - run:
-          name: run flake8
+          name: Deploy to Heroku
           command: |
-            . venv/bin/activate
-            flake8 weather_service
+             docker login --username=$HEROKU_LOGIN --password=$HEROKU_API_KEY registry.heroku.com
+             docker tag maxis110/bot:$CIRCLE_SHA1 registry.heroku.com/$HEROKU_APP_NAME_BOT/web
+             docker push registry.heroku.com/$HEROKU_APP_NAME_BOT/web
+
+             docker tag maxis110/web:$CIRCLE_SHA1 registry.heroku.com/$HEROKU_APP_NAME_WEB/web
+             docker push registry.heroku.com/$HEROKU_APP_NAME_WEB/web
 
       - run:
-          name: run integration test
-          command: |
-            . venv/bin/activate
-            python manage.py test
-
-      - store_artifacts:
-          path: test-reports
-          destination: test-reports
+          name: Check images
+          command: docker images
 
 workflows:
   version: 2
@@ -62,4 +42,4 @@ workflows:
       - build:
           filters:
             branches:
-              only: develop
+              only: poc_telegram_bot
